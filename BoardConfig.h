@@ -11,8 +11,8 @@
 #define RESISTOR_RATIO  RESISTOR_2 / ( RESISTOR_1 + RESISTOR_2 )
 #define ADC_MARK        int(((BATTERY_VOLTAGE * RESISTOR_RATIO) / 3.3) * 4095)
 
-#define SENSOR_Trigger  2
-#define SENSOR_RAW_PIN  3
+#define SENSOR_Trigger  0
+#define SENSOR_RAW_PIN  2
 
 #define R_DEVIDER       10000.0
 

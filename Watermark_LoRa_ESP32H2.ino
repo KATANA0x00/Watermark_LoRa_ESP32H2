@@ -15,7 +15,7 @@ SX1276 radio = new Module(RFM95_CS, RFM95_INT, RFM95_RST);
 LoRaWANNode node(&radio, &Region);
 
 char messageBuffer[64];
-int LORA_SEND_TIME = 1;
+int LORA_SEND_TIME = 15;
 void setup() {
   SPI.begin(10, 4, 5);
   pinInit();
@@ -35,22 +35,22 @@ void setup() {
 
   int16_t state = node.sendReceive(message, 1, downlinkBuffer, &downlinkLength, false, NULL, NULL);
 
-  EEPROM.begin(32);
+  // EEPROM.begin(32);/
   if(downlinkLength > 0){
     rgbLedWrite(NEO_PIXEL, 0, 150, 200);
-    EEPROM.write(0, HexToStr(downlinkBuffer, downlinkLength).toInt());
-    EEPROM.commit();
+    // EEPROM.write(0, HexToStr(downlinkBuffer, downlinkLength).toInt());
+    // EEPROM.commit();
   }
   else {
     if(state == 0) rgbLedWrite(NEO_PIXEL, 0, 200, 0);
     else if(state < 0) rgbLedWrite(NEO_PIXEL, 200, 0, 0);
-    if (EEPROM.read(0) == 0xFF || EEPROM.read(0) == 0) {
-      EEPROM.write(0, 1);
-      EEPROM.commit();
-    }
+    // if (EEPROM.read(0) == 0xFF || EEPROM.read(0) == 0) {
+    //   EEPROM.write(0, 1);
+    //   EEPROM.commit();
+    // }
   }
-  LORA_SEND_TIME = EEPROM.read(0);
-  EEPROM.end();
+  // LORA_SEND_TIME = EEPROM.read(0);
+  // EEPROM.end();
 
   delay(500);
   rgbLedWrite(NEO_PIXEL, 0, 0, 0);
