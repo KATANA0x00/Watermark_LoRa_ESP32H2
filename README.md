@@ -6,7 +6,7 @@ LoRa node for **_Watermark_** Sensor using **_ESP32H2_**.
 ## **Overview**
 System is automatic reading value from **_Watermark_** sensor and sending to gateway with period time that setting or command, Default of code is **1 minute period**. With can change period of sending time from downlink message.
 
-**START** --> **Read Sensor Value** --> **Send Valur to Gatway** --> **check downlink message** --> **Sleep**
+**START** --> **Read Sensor Value** --> **Send Value to Gateway** --> **check downlink message** --> **Sleep**
 
 ## **How To**
 **File Declare**\
