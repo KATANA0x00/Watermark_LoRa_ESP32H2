@@ -2,14 +2,14 @@
 #include <BoardConfig.h>
 #include <EEPROM.h>
 
-#define RFM95_CS   11
-#define RFM95_RST  22
-#define RFM95_INT  25
+#define RFM95_CS 11
+#define RFM95_RST 22
+#define RFM95_INT 25
 
 const LoRaWANBand_t Region = AS923;
-uint32_t DevAddr = 0x--------;
-uint8_t NwkSKey[] = { 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x-- };
-uint8_t AppSKey[] = { 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x--, 0x-- };
+uint32_t DevAddr = 0x93230FFF;
+uint8_t NwkSKey[] = { 0x5E, 0xD0, 0x5F, 0x6B, 0xCA, 0x7C, 0xD2, 0x56, 0xD4, 0x26, 0xE9, 0xB0, 0xA7, 0x68, 0x13, 0xAE };
+uint8_t AppSKey[] = { 0xD5, 0x7F, 0x47, 0x3E, 0x1C, 0xB4, 0xA5, 0x1F, 0x9B, 0x95, 0xB8, 0xFB, 0x2C, 0x3A, 0x92, 0x01 };
 
 SX1276 radio = new Module(RFM95_CS, RFM95_INT, RFM95_RST);
 LoRaWANNode node(&radio, &Region);
@@ -27,30 +27,37 @@ void setup() {
 
   node.beginABP(DevAddr, NULL, NULL, NwkSKey, AppSKey);
   node.activateABP();
-  node.setDeviceStatus( map(getBattery(), 0, 100, 0, 255) );
-  snprintf(messageBuffer, sizeof(messageBuffer), "{\"RST\":%.2f,\"RADC\":%.0f,\"BATT\":%.2f,\"BADC\":%.0f}",getSensor(),getSensor(true),getBattery(),getBattery(true));
+  node.setDeviceStatus(map(getBattery(), 0, 100, 0, 255));
+  snprintf(messageBuffer, sizeof(messageBuffer), "{\"RST\":%.2f,\"RADC\":%.0f,\"BATT\":%.2f,\"BADC\":%.0f}", getSensor(), getSensor(true), getBattery(), getBattery(true));
   const char* message = messageBuffer;
   uint8_t downlinkBuffer[64];
   size_t downlinkLength = 0;
 
   int16_t state = node.sendReceive(message, 1, downlinkBuffer, &downlinkLength, false, NULL, NULL);
 
-  // EEPROM.begin(32);/
-  if(downlinkLength > 0){
+  if (downlinkLength <= 0) {
+    rgbLedWrite(NEO_PIXEL, 200, 0, 0);
+    ESP.restart();
+  }
+
+  int result = HexToStr(downlinkBuffer, downlinkLength).toInt();
+  EEPROM.begin(32);
+  if (result > 0) {
     rgbLedWrite(NEO_PIXEL, 0, 150, 200);
-    // EEPROM.write(0, HexToStr(downlinkBuffer, downlinkLength).toInt());
-    // EEPROM.commit();
+    EEPROM.write(0, result);
+    EEPROM.commit();
   }
-  else {
-    if(state == 0) rgbLedWrite(NEO_PIXEL, 0, 200, 0);
-    else if(state < 0) rgbLedWrite(NEO_PIXEL, 200, 0, 0);
-    // if (EEPROM.read(0) == 0xFF || EEPROM.read(0) == 0) {
-    //   EEPROM.write(0, 1);
-    //   EEPROM.commit();
-    // }
+  else if (result == 0) {
+    rgbLedWrite(NEO_PIXEL, 0, 200, 0);
   }
-  // LORA_SEND_TIME = EEPROM.read(0);
-  // EEPROM.end();
+
+  //First Start NO EEPROM
+  if (EEPROM.read(0) == 0xFF || EEPROM.read(0) == 0) {
+    EEPROM.write(0, 15);
+    EEPROM.commit();
+  }
+  LORA_SEND_TIME = EEPROM.read(0);
+  EEPROM.end();
 
   delay(500);
   rgbLedWrite(NEO_PIXEL, 0, 0, 0);
@@ -59,7 +66,6 @@ void setup() {
 }
 
 void loop() {
-  
 }
 
 String HexToStr(uint8_t* data, size_t len) {
