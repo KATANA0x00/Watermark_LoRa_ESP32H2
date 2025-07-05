@@ -37,7 +37,8 @@ void setup() {
 
   if (downlinkLength <= 0) {
     rgbLedWrite(NEO_PIXEL, 200, 0, 0);
-    ESP.restart();
+    esp_sleep_enable_timer_wakeup(60 * 1000 * 1000);
+    esp_deep_sleep_start();
   }
 
   int result = HexToStr(downlinkBuffer, downlinkLength).toInt();
