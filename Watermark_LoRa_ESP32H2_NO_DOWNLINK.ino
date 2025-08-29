@@ -7,8 +7,8 @@
 
 const LoRaWANBand_t Region = AS923;
 uint32_t DevAddr = 0x3EDE35CB;
-uint8_t NwkSKey[] = { 0xFF, 0x71, 0x9E, 0x06, 0xEA, 0xE6, 0x46, 0x92, 0x56, 0x88, 0x21, 0xCD, 0x3F, 0xDB, 0xB1, 0x31 };
-uint8_t AppSKey[] = { 0x49, 0x5F, 0xE9, 0x3D, 0x88, 0x2E, 0x7C, 0x0D, 0x25, 0x94, 0x71, 0x50, 0x51, 0x19, 0xFB, 0x6D };
+const char NwkSKey[] = "FF719E06EAE64692568821CD3FDBB131";
+const char AppSKey[] = "495FE93D882E7C0D259471505119FB6D";
 
 SX1276 radio = new Module(RFM95_CS, RFM95_INT, RFM95_RST);
 LoRaWANNode node(&radio, &Region);
@@ -24,7 +24,7 @@ void setup() {
   radio.setSpreadingFactor(10);
   radio.setBandwidth(125.0);
 
-  node.beginABP(DevAddr, NULL, NULL, NwkSKey, AppSKey);
+  node.beginABP(DevAddr, NULL, NULL, hexStringToBytes(NwkSKey).data(), hexStringToBytes(AppSKey).data());
   node.activateABP();
   node.setDeviceStatus(map(getBattery(), 0, 100, 0, 255));
   snprintf(messageBuffer, sizeof(messageBuffer), "{\"moisture\":%.2f,\"BATT\":%.2f}", getSensor(), getBattery());

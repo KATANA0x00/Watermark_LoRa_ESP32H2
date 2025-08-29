@@ -7,9 +7,9 @@
 #define RFM95_INT 25
 
 const LoRaWANBand_t Region = AS923;
-uint32_t DevAddr = 0x93230FFF;
-uint8_t NwkSKey[] = { 0x5E, 0xD0, 0x5F, 0x6B, 0xCA, 0x7C, 0xD2, 0x56, 0xD4, 0x26, 0xE9, 0xB0, 0xA7, 0x68, 0x13, 0xAE };
-uint8_t AppSKey[] = { 0xD5, 0x7F, 0x47, 0x3E, 0x1C, 0xB4, 0xA5, 0x1F, 0x9B, 0x95, 0xB8, 0xFB, 0x2C, 0x3A, 0x92, 0x01 };
+uint32_t DevAddr = 0x3EDE35CB;
+const char NwkSKey[] = "FF719E06EAE64692568821CD3FDBB131";
+const char AppSKey[] = "495FE93D882E7C0D259471505119FB6D";
 
 SX1276 radio = new Module(RFM95_CS, RFM95_INT, RFM95_RST);
 LoRaWANNode node(&radio, &Region);
@@ -25,7 +25,7 @@ void setup() {
   radio.setSpreadingFactor(10);
   radio.setBandwidth(125.0);
 
-  node.beginABP(DevAddr, NULL, NULL, NwkSKey, AppSKey);
+  node.beginABP(DevAddr, NULL, NULL, hexStringToBytes(NwkSKey).data(), hexStringToBytes(AppSKey).data());
   node.activateABP();
   node.setDeviceStatus(map(getBattery(), 0, 100, 0, 255));
   snprintf(messageBuffer, sizeof(messageBuffer), "{\"RST\":%.2f,\"RADC\":%.0f,\"BATT\":%.2f,\"BADC\":%.0f}", getSensor(), getSensor(true), getBattery(), getBattery(true));
