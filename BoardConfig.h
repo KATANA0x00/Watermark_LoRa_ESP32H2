@@ -2,6 +2,7 @@
 #define SENSORS_H
 
 #include <Arduino.h>
+#include <vector>
 
 #define BATTERY_V_PIN   1
 
@@ -52,6 +53,31 @@ float getSensor(bool convert_flag = false) {
 
   if(convert_flag) { return val_raw * 1.0; }
   else { return RS_calculate(val_raw); }
+}
+
+String HexToStr(uint8_t* data, size_t len) {
+  String result = "";
+  for (size_t i = 0; i < len; i++) {
+    result += (char)data[i];
+  }
+  return result;
+}
+
+uint8_t hexCharToValue(char c) {
+  if (c >= '0' && c <= '9') return c - '0';
+  if (c >= 'A' && c <= 'F') return c - 'A' + 10;
+  if (c >= 'a' && c <= 'f') return c - 'a' + 10;
+  return 0;
+}
+
+std::vector<uint8_t> hexStringToBytes(const String &hexStr) {
+  size_t outSize = hexStr.length() / 2;
+  std::vector<uint8_t> out(outSize);
+
+  for (size_t i = 0; i < outSize; i++) {
+    out[i] = (hexCharToValue(hexStr[i * 2]) << 4) | hexCharToValue(hexStr[i * 2 + 1]);
+  }
+  return out;
 }
 
 #endif
