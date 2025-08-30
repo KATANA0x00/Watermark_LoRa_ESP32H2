@@ -52,7 +52,7 @@ void setup() {
   node.beginABP(DevAddr, NULL, NULL, hexStringToBytes(NwkSKey).data(), hexStringToBytes(AppSKey).data());             // Set Key for Node
   node.activateABP();
   node.setDeviceStatus(map(getBattery(), 0, 100, 0, 255));
-  snprintf(messageBuffer, sizeof(messageBuffer), "{\"moisture\":%.2f,\"BATT\":%.2f}", getSensor(true), getBattery()); // Create Message
+  snprintf(messageBuffer, sizeof(messageBuffer), "{\"moisture\":%.2f,\"BATT\":%.2f}", getSensor(true), getBattery(true)); // Create Message
   -----------------------
   getSensor() - read WaterMark sensor with Raw ADC
   getSensor(true) - read WaterMark sensor in Resistance
